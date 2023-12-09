@@ -30,12 +30,38 @@ foreach ($nodes as $key => $node) {
     }
 }
 
+$firstCheck = $nodeKeys[0];
+$value = $firstCheck;
+$answers = [];
+$count = 1;
+foreach ($nodeKeys as $key => $value) {
+    while (true) {
+        foreach ($instructions as $instruction) {
+            $node = $nodes[$firstCheck];
+            if ($instruction == 'L') {
+                $firstCheck = $node[0];
+            } else {
+                $firstCheck = $node[1];
+            }
+            if (str_split($firstCheck)[2] == 'Z') {
+                $answers[$value][] = $count;
+                break;
+            }
+            $count++;
+        }
+        if (isset($answers[$value]) && count($answers[$value]) == 100) {
+            break;
+        }
+    }
+}
+dd($answers);
+
+
 $count = 1;
 $answer = false;
 while(!$answer) {
     [$nodeKeys, $count, $answer] = loop($instructions, $nodes, $count, $nodeKeys);
 }
-
 
 function loop($instructions, $nodes, &$count, &$nodeKeys) {;
     $start=hrtime(true);
@@ -47,7 +73,7 @@ function loop($instructions, $nodes, &$count, &$nodeKeys) {;
             if ($instruction == 'L') {
                 $answer = str_split($node[0]);
                 if ($answer[2] == 'Z') {
-                    $nodeKeyAnswers[] = 1;
+                    $nodeKeyAnswers[$key2] = 1;
                     $nodeKeys[$key2] = $node[0];
                     continue;
                 }
@@ -55,14 +81,14 @@ function loop($instructions, $nodes, &$count, &$nodeKeys) {;
             } else {
                 $answer = str_split($node[1]);
                 if ($answer[2] == 'Z') {
-                    $nodeKeyAnswers[] = 1;
+                    $nodeKeyAnswers[$key2] = 1;
                     $nodeKeys[$key2] = $node[1];
                     continue;
                 }
                 $nodeKeys[$key2] = $node[1];
             }
         }
-
+        // 
         if (array_sum($nodeKeyAnswers) == count($nodeKeys)) {
             dump('answered');
             return [$nodeKeys, $count, true];
